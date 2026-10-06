@@ -10,7 +10,7 @@
     const key = event.key.toLowerCase();
     const destination = window.SiteContent.navigation.find(item => item.key === key);
     if (destination) {
-      if ((/^\d$/.test(key) && window.SiteViews.isOpen()) || window.siteOverlays?.isOpen() || window.projectLightbox?.isOpen()) return;
+      if (window.SiteViews.isOpen() || window.siteOverlays?.isOpen() || window.projectLightbox?.isOpen()) return;
       event.preventDefault(); window.SiteViews.openSection(destination.id);
     } else if (key === 'm') { event.preventDefault(); window.toggleTheme(); }
     else if (key === '?') { event.preventDefault(); window.siteOverlays.openHelp(); }

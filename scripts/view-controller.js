@@ -75,30 +75,40 @@
     }
     clearTimeout(transitionTimer);
     const token = ++state.token;
-    state.view = name; state.projectId = projectId; state.phase = 'opening';
-    main.inert = true; brand.inert = true;
-    if (renderedKey !== nextKey) renderView();
-    updateTitle();
-    scroll.scrollTop = scrollPositions.get(nextKey) || 0;
-    view.classList.remove('is-closing');
-    view.classList.remove('is-visible');
-    document.body.classList.add('is-switching');
-    if (updateURL) writeURL(name,projectId);
-    document.dispatchEvent(new CustomEvent('site:view-change'));
-    // Commit the hidden state first so reopening replays the stagger.
-    requestAnimationFrame(() => requestAnimationFrame(() => {
+    const switchingSection = Boolean(state.view);
+    if (switchingSection) {
+      state.phase = 'opening';
+      view.classList.remove('is-visible');
+    }
+    const showSection = () => {
       if (token !== state.token) return;
-      view.append(tools);
-      view.inert = false;
-      view.setAttribute('aria-hidden', 'false');
-      document.body.dataset.view = name;
-      view.classList.add('is-visible');
-      if (!window.siteOverlays?.isOpen() && !window.projectLightbox?.isOpen()) view.focus({preventScroll:true});
-      transitionTimer = setTimeout(() => {
+      state.view = name; state.projectId = projectId; state.phase = 'opening';
+      main.inert = true; brand.inert = true;
+      if (renderedKey !== nextKey) renderView();
+      updateTitle();
+      scroll.scrollTop = scrollPositions.get(nextKey) || 0;
+      view.classList.remove('is-closing');
+      view.classList.remove('is-visible');
+      document.body.classList.add('is-switching');
+      if (updateURL) writeURL(name,projectId);
+      document.dispatchEvent(new CustomEvent('site:view-change'));
+      // Commit the hidden state first so reopening replays the stagger.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
         if (token !== state.token) return;
-        state.phase = 'open'; document.body.classList.remove('is-switching');
-      }, duration());
-    }));
+        view.append(tools);
+        view.inert = false;
+        view.setAttribute('aria-hidden', 'false');
+        document.body.dataset.view = name;
+        view.classList.add('is-visible');
+        if (!window.siteOverlays?.isOpen() && !window.projectLightbox?.isOpen()) view.focus({preventScroll:true});
+        transitionTimer = setTimeout(() => {
+          if (token !== state.token) return;
+          state.phase = 'open'; document.body.classList.remove('is-switching');
+        }, duration());
+      }));
+    };
+    if (switchingSection) transitionTimer = setTimeout(showSection, duration());
+    else showSection();
   }
   function closeSection(updateURL = true) {
     if (!state.view || state.phase === 'closing') return;
