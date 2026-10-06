@@ -1,0 +1,17 @@
+:root {
+  color-scheme: light;
+  --paper: #f7f6f2; --paper-raised: #efeee9; --ink: #191916; --muted: #696861; --line: rgba(25,25,22,.13);
+  --serif: "Times New Roman", Times, Georgia, serif; --sans: Arial, Helvetica, sans-serif;
+  --text-xs: .68rem; --text-sm: .78rem; --text-base: .94rem; --text-lg: 1.25rem;
+  --space-1: .35rem; --space-2: .7rem; --space-3: 1rem; --space-4: 1.5rem; --space-5: 2rem; --space-6: 3rem; --space-7: 5rem; --space-8: 8rem;
+  --view-fade: 500ms; --item-fade: 400ms; --hover-speed: 250ms; --load-fade: 400ms;
+  --speed-fast: 200ms; --speed: 240ms; --speed-slow: 380ms; --ease: ease;
+  /* Media queries repeat these values: custom properties cannot be used in media conditions. */
+  --bp-tablet: 760px; --bp-mobile: 520px; --content: 1376px;
+}
+:root[data-theme="dark"] { color-scheme: dark; --paper: #181817; --paper-raised: #222221; --ink: #eeede8; --muted: #aaa9a2; --line: rgba(238,237,232,.14); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { color-scheme: dark; --paper: #181817; --paper-raised: #222221; --ink: #eeede8; --muted: #aaa9a2; --line: rgba(238,237,232,.14); }
+}
+@media (prefers-reduced-motion: reduce) { :root { --view-fade: 0ms; --item-fade: 0ms; --hover-speed: 0ms; --load-fade: 0ms; --speed-fast: 0ms; --speed: 0ms; --speed-slow: 0ms; } }
+

@@ -1,0 +1,90 @@
+.timeline { max-width: 32rem; margin-left: 3.1rem; }
+.timeline > li { display: grid; grid-template-columns: 7.5rem minmax(0,1fr); gap: 1.4rem; padding: 0 0 1.45rem; }
+.timeline h2 { font-size: .8rem; margin-bottom: .15rem; }
+.timeline p { margin-bottom: 0; font-size: .74rem; }
+.period, .project-period { font-size: .68rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.intro { font-size: .78rem; line-height: 1.55; max-width: 27rem; margin-bottom: 1.8rem; }
+.profile-list > div { display: grid; grid-template-columns: 5rem minmax(0,1fr); gap: 1.3rem; padding: 0 0 1rem; }
+.profile-list dt { font-size: .7rem; color: var(--muted); }
+.profile-list dd p { margin-bottom: .8rem; }
+.profile-list dd p:last-child { margin-bottom: 0; }
+.tool-section { margin-bottom: 2rem; }
+.tool-section .eyebrow { font-size: .59rem; margin-bottom: .4rem; }
+.tool-section h2 { font-size: .76rem; margin-bottom: .55rem; }
+.tool-section h3 { font-size: .7rem; color: var(--muted); margin: .85rem 0 .3rem; }
+.tool-list { columns: 2; column-gap: 1.5rem; }
+.tool-list li { break-inside: avoid; padding: .05rem 0; }
+.project-index { max-width: 44rem; }
+.project-row { display: grid; grid-template-columns: 5.5rem minmax(0,1fr); gap: 1.4rem; padding: 0 0 2rem; }
+.project-row h2 { font-size: .88rem; line-height: 1.35; margin-bottom: .25rem; overflow-wrap: anywhere; }
+.project-location { margin-bottom: .5rem; color: var(--muted); font-size: .7rem; }
+.project-facts { max-width: 36rem; }
+.project-facts > div { display: grid; grid-template-columns: 7.4rem minmax(0,1fr); gap: .9rem; padding: .04rem 0; font-size: .7rem; line-height: 1.45; }
+.project-facts dt { color: var(--muted); }
+.project-heading { margin: 1.4rem 0 2rem; max-width: 36rem; }
+.project-heading h1 { font-size: .95rem; line-height: 1.4; letter-spacing: .02em; margin-bottom: .5rem; overflow-wrap: anywhere; }
+.project-heading p { font-size: .74rem; color: var(--muted); }
+.back-link, .project-pagination { font-size: .68rem; color: var(--muted); }
+.project-image { margin: 0 0 3rem; max-width: var(--content); }
+.project-image figcaption { font-size: .62rem; color: var(--muted); padding-top: .4rem; }
+.image-trigger { display: block; width: 100%; padding: 0; text-align: inherit; }
+.image-placeholder { display: grid; place-items: center; width: 100%; background: var(--paper-raised); color: var(--muted); padding: 1rem; text-align: center; font-family: var(--sans); font-size: var(--text-xs); }
+.project-information { display: grid; grid-template-columns: 1fr 1fr; max-width: 48rem; gap: 3rem; margin: 3rem 0 4rem; }
+.project-information h2 { font-size: .7rem; margin-bottom: .65rem; }
+.project-information section { max-width: 25rem; margin-bottom: 1.5rem; }
+.project-gallery { max-width: var(--content); }
+.project-gallery .project-image:nth-child(odd) { width: 65%; margin-left: auto; }
+.project-pagination { display: flex; justify-content: space-between; max-width: var(--content); gap: 2rem; padding-top: .8rem; border-top: 1px solid var(--line); }
+.log-archive { max-width: 48rem; }
+.log-categories { font-size: .62rem; max-width: 25rem; margin-top: 1.5rem; }
+.log-entry { max-width: 36rem; margin-bottom: 4rem; break-inside: avoid; }
+.log-entry:nth-child(even) { max-width: 28rem; margin-left: 8rem; }
+.log-entry h2 { display: flex; align-items: baseline; gap: 1rem; font-size: .78rem; margin-bottom: .2rem; }
+.log-number, .log-entry header p { font-size: .65rem; color: var(--muted); }
+.log-entry figure { margin: 1rem 0; }
+.log-text { max-width: 24rem; font-size: .74rem; }
+
+.project-preview { position: fixed; z-index: 20; pointer-events: none; opacity: 0; transition: opacity var(--speed); }
+.project-preview.is-visible { opacity: 1; }
+.project-preview img, .project-preview .image-placeholder { width: 100%; height: 100%; object-fit: contain; }
+.overlay, .lightbox { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; border: 0; color: var(--ink); background: var(--paper); padding: 2rem; opacity: 0; transition: opacity var(--speed); }
+.overlay[open], .lightbox[open] { display: grid; place-items: center; }
+.overlay::backdrop, .lightbox::backdrop { background: transparent; }
+.overlay.is-open, .lightbox.is-open { opacity: 1; }
+.overlay-panel { width: min(100%,30rem); }
+.overlay-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2rem; }
+.overlay-top h2 { font-size: 1.6rem; }
+.shortcut-list { display: grid; grid-template-columns: 4rem 1fr; gap: .7rem 1rem; }
+kbd { font: inherit; color: var(--muted); }
+.lightbox { padding: 3.5rem 2rem 2rem; }
+.lightbox-close { position: absolute; right: 1.8rem; top: 1.1rem; font-size: 1.3rem; }
+.lightbox-image { max-width: 100%; max-height: 100%; }
+.lightbox-image img { width: auto; max-height: calc(100svh - 5.5rem); object-fit: contain; }
+.lightbox-image .image-placeholder { width: min(80vw,1000px); max-height: calc(100svh - 5.5rem); }
+@media (max-width: 760px) {
+  .timeline { margin-left: 2.3rem; }
+  .timeline > li { grid-template-columns: 1fr; gap: .3rem; padding-bottom: 1.4rem; }
+  .project-row { grid-template-columns: 1fr; gap: .3rem; padding-bottom: 1.8rem; margin-left: 2.3rem; }
+  .project-facts > div { grid-template-columns: 6rem minmax(0,1fr); gap: .7rem; }
+  .project-information { grid-template-columns: 1fr; gap: 2.5rem; margin: 2.5rem 0; }
+  .project-gallery .project-image:nth-child(odd) { width: 100%; }
+  .project-image { margin-bottom: 2.5rem; }
+  .profile-list > div { grid-template-columns: 1fr; gap: .2rem; }
+  .log-entry:nth-child(even) { margin-left: 0; max-width: 100%; }
+  .tool-list { columns: 1; }
+  .overlay, .lightbox { padding: 3.5rem 1.15rem 1.15rem; }
+  .lightbox-image .image-placeholder { width: calc(100vw - 2.3rem); }
+}
+
+
+.home-index a { transition: transform var(--hover-speed) ease; }
+.home-index a > span:first-child { opacity: .4; transition: opacity var(--hover-speed) ease; }
+.home-index a:hover, .home-index a:focus-visible { opacity: 1; transform: translateX(4px); }
+.home-index a:hover > span:first-child, .home-index a:focus-visible > span:first-child { opacity: .65; }
+/* Optional, opt-in reveal for a future featured image. Not applied to normal imagery. */
+.featured-reveal { clip-path: inset(100% 0 0 0); transition: clip-path var(--item-fade) ease; }
+.featured-reveal.is-revealed { clip-path: inset(0 0 0 0); }
+@media (prefers-reduced-motion: reduce) {
+  .home-index a:hover, .home-index a:focus-visible { transform: none; }
+  .featured-reveal, .featured-reveal.is-revealed { clip-path: none; transition: none; }
+}
