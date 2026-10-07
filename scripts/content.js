@@ -38,7 +38,7 @@
       } else if (page === 'current') {
         body = `<dl class="profile-list page-body">${data.current.map(item => `<div><dt>${t(item.label)}</dt><dd>${text(item.value)}</dd></div>`).join('')}</dl>`;
       } else if (page === 'log') {
-        body = `<div class="log-archive page-body">${data.logEntries.length ? data.logEntries.map((entry,n) => `<article class="log-entry"><header><h2><span class="log-number">${esc(entry.number || String(n+1).padStart(3,'0'))}</span>${text(entry.title)}</h2><p class="secondary">${[i18n.text(entry.location), entry.date, i18n.t('logCategories')[data.logCategories.indexOf(entry.category)]].filter(Boolean).map(esc).join(' · ')}</p></header>${(entry.images || []).map(id => `<figure><button class="image-trigger" data-image-id="${esc(id)}" aria-label="${t('openImage')}: ${text(data.images[id].alt)}">${imageMarkup(id,false,false,'(max-width: 760px) calc(100vw - 4.6rem), 576px')}</button></figure>`).join('')}${entry.text ? `<p class="log-text">${text(entry.text)}</p>` : ''}</article>`).join('') : `<p class="secondary">${t('logEmpty')}</p><p class="log-categories secondary">${i18n.t('logCategories').map(esc).join(' · ')}</p>`}</div>`;
+        body = '<div class="log-viewport" tabindex="0" role="region"><div class="log-pan"><div class="log-field"></div></div><div class="log-rail log-rail-x" aria-hidden="true"><span></span></div><div class="log-rail log-rail-y" aria-hidden="true"><span></span></div><p class="sr-only log-instructions"></p></div>';
       } else if (page === 'contact') {
         body = `<div class="archive-empty"><p>${t('contactPending')}</p></div>`;
       } else {

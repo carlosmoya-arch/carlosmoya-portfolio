@@ -96,7 +96,7 @@ window.SiteContent = {
     { label: 'currentProjects', value: 'PowerCo / Volkswagen — Sagunto' },
     { label: 'location', value: { en: 'Valencia · Munich', de: 'Valencia · München', es: 'Valencia · Múnich' } }
   ],
-  // Add only actual observations. Numbers remain stable when entries are reordered.
+  // Actual observations belong here; the final temporary block supplies layout-test plates.
   // Entry: { number: '001', title: { en, de, es }, location?: { en, de, es }, date, category, images: ['image-id'], text?: { en, de, es } }.
   logCategories: ['SITE', 'ARCHITECTURE', 'DETAIL', 'MATERIAL', 'DESIGN', 'OBJECT', 'PROCESS', 'REFERENCE'],
   logEntries: [],
@@ -214,4 +214,24 @@ window.SiteContent = {
     {"number":"008","placeholder":true,"title":{"en":"Temporary — Timber steps","de":"Temporär — Holzstufen","es":"Provisional — Peldaños de madera"},"category":"MATERIAL","images":["placeholder-timber-detail"],"text":{"en":"Temporary layout reference only; not Carlos Moya's work or field documentation. Photo: Monstera Production / Pexels.","de":"Temporäre Layoutreferenz; keine Arbeit oder Baustellendokumentation von Carlos Moya. Foto: Monstera Production / Pexels.","es":"Referencia temporal para evaluar el archivo; no es obra ni documentación de Carlos Moya. Foto: Monstera Production / Pexels."}},
     {"number":"009","placeholder":true,"title":{"en":"Temporary — Urban volumes","de":"Temporär — Städtische Baukörper","es":"Provisional — Volúmenes urbanos"},"category":"REFERENCE","images":["placeholder-urban-volumes"],"text":{"en":"Temporary layout reference only; not Carlos Moya's work or field documentation. Photo: Quang Lự Đỗ / Pexels.","de":"Temporäre Layoutreferenz; keine Arbeit oder Baustellendokumentation von Carlos Moya. Foto: Quang Lự Đỗ / Pexels.","es":"Referencia temporal para evaluar el archivo; no es obra ni documentación de Carlos Moya. Foto: Quang Lự Đỗ / Pexels."}}
   ];
+  // Repeat existing references to give the 2D prototype sufficient bounded travel.
+  // These are layout samples, not 51 distinct observations or photographed projects.
+  const samples = [...window.SiteContent.logEntries];
+  const used = new Set(samples.map(entry => entry.images[0]));
+  const categories = { 'industrial-warehouse': 'SITE', 'office-facade': 'ARCHITECTURE', 'urban-symmetry': 'ARCHITECTURE', 'symmetric-windows': 'DETAIL', 'window-grid': 'DETAIL', 'minimal-facade': 'ARCHITECTURE', 'monochrome-facade': 'REFERENCE', 'angular-facade': 'REFERENCE' };
+  Object.entries(window.SiteContent.images).filter(([id, image]) => image.placeholder && !used.has(id)).forEach(([id, image]) => {
+    samples.push({ placeholder: true, title: {
+      en: image.alt.en.replace('Temporary Pexels reference: ', 'Temporary — ').replace('. Not a Carlos Moya project.', ''),
+      de: image.alt.de.replace('Temporäre Pexels-Referenz: ', 'Temporär — ').replace('. Kein Projekt von Carlos Moya.', ''),
+      es: image.alt.es.replace('Referencia temporal de Pexels: ', 'Provisional — ').replace('. No es un proyecto de Carlos Moya.', '')
+    }, category: categories[id.replace('placeholder-', '')] || 'REFERENCE', images: [id] });
+  });
+  window.SiteContent.logEntries = Array.from({ length: samples.length * 3 }, (_, index) => {
+    const entry = samples[index % samples.length], image = window.SiteContent.images[entry.images[0]];
+    return { ...entry, number: String(index + 1).padStart(3, '0'),
+      location: { en: 'Pexels reference', de: 'Pexels-Referenz', es: 'Referencia Pexels' },
+      date: '—', width: image.width, height: image.height, src: image.src,
+      credit: image.credit, sourceUrl: image.sourceUrl
+    };
+  });
 })();

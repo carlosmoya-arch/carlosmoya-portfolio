@@ -1,6 +1,6 @@
 # Temporary Pexels imagery
 
-These 17 reference photographs are temporary placeholders for the 17 PROJECTS hover previews and nine LOG layout samples. None depicts or documents a Carlos Moya project. They are not added to project galleries.
+These 17 reference photographs are temporary placeholders for the 17 PROJECTS hover previews and the LOG 2D field. LOG reuses them three times to provide 51 numbered layout-test plates with sufficient horizontal and vertical travel. These are not 51 distinct observations. None depicts or documents a Carlos Moya project. They are not added to project galleries.
 
 License: https://www.pexels.com/license/ (checked 7 October 2026). Pexels permits free use and modification. Credits are retained here, in sources.json, and in LOG captions.
 

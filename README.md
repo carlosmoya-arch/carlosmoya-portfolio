@@ -83,7 +83,7 @@ Current contains three factual rows. About keeps a short profile, languages (Spa
 
 ### Add an observation to LOG
 
-The final temporary Pexels block in `scripts/content-data.js` currently supplies nine clearly labelled layout samples. Remove that block to restore the empty LOG before adding real observations. Sources, credits and removal instructions are in [assets/images/placeholders/README.md](assets/images/placeholders/README.md). Add a real record with:
+The final temporary Pexels block in `scripts/content-data.js` supplies 51 numbered layout-test plates, reusing the 17 local reference photographs three times. These are explicitly temporary samples, not actual observations. Remove that block to restore the empty LOG before adding real observations. Sources and credits are in [assets/images/placeholders/README.md](assets/images/placeholders/README.md). Add a real record with:
 
 ```
 {
@@ -97,7 +97,21 @@ The final temporary Pexels block in `scripts/content-data.js` currently supplies
 }
 ```
 
-Use one of SITE, ARCHITECTURE, DETAIL, MATERIAL, DESIGN, OBJECT, PROCESS, REFERENCE. Category names translate automatically. Keep the number stable when reordering entries. Images use the same WebP metadata and lightbox as project images, with natural proportions and lazy loading. Entries need no article, teaser or Read more link.
+Use one of SITE, ARCHITECTURE, DETAIL, MATERIAL, DESIGN, OBJECT, PROCESS, REFERENCE. Category names translate automatically. Keep the number stable when reordering entries. LOG now displays image plates in a bounded 2D field and enlarges them in place, independently of the project lightbox. Image proportions remain natural and loading is lazy. Entries need no article, teaser or Read more link.
+
+### LOG 2D field
+
+`scripts/log-field.js` mounts only when the shared renderer supplies `.log-viewport`. `styles/log-field.css` affects only that field and its containing `.view-scroll`; other sections retain their original content and scrolling. All HTML entry points include these two assets so direct visits can still navigate to LOG. The shared overlay controller, fixed Close button, 500ms section transitions, ES/DE/EN controls, theme tokens and site fonts remain unchanged. Escape prioritizes help/project lightboxes, then an enlarged LOG plate, then the section.
+
+The field starts centered and distributes plates to the shortest column. Columns are 172px wide with 48px horizontal gaps, or 132px/30px below 700px, with 44px vertical gaps and deterministic offsets up to 190px. Column count balances horizontal and vertical travel using the quadratic from the supplied specification. Normal pan has 96px boundary slack. Drag uses pointer capture and tracks 1:1; release velocity is multiplied by 12, decays by .94 per 60Hz frame and interpolates by .16, normalized for frame rate. Wheel/trackpad pans both axes at twice the event delta; Ctrl+wheel remains available for browser zoom. Rails show visible fractions and fade after 1.1 seconds of inactivity.
+
+Images enter once with the specified .5s opacity/.55s scale transitions and up to .45s delay. Initially visible plates appear immediately; later plates use IntersectionObserver with 45% vertical/40% horizontal margins. The field settles from .9 to 1 over 950ms. Clicking without a drag over 6px enlarges a frame, moves its caption down and displaces neighboring plates radially. Clicking the same plate or empty space, or pressing Escape, closes it. Keyboard users can focus/activate plates and pan with arrow keys. Touch uses the same pointer model, including cancellation.
+
+Record fields supported by LOG: `number`, translated `title`, translated `location`, `date` or `year`, `category`, `images` (first image is the plate), and optional direct `src`, `width`, `height`, `zoomSrc`, translated `alt`, `credit`, `sourceUrl`, and translated `text`. Image dimensions/source/credit otherwise come from the referenced image metadata. Placeholder dates remain “—” rather than inventing observation dates. No video support is included.
+
+Adaptations: LOG uses the existing site chrome, fonts, theme colors and language styling rather than the reference site's branding, page title/footer, language font treatment or navigation veil. Existing bounded local WebP files (maximum side 1200px) are reused for zoom; future records can supply `zoomSrc` for a larger local export. Zoom is normally clamped to 1.5–3.4 but also constrained to fit very short/narrow windows. Boundary clearance expands only while an exterior plate is enlarged and returns to 96px when closed. Reduced motion also removes inertia and interpolation, in addition to the specified CSS animations. Language/resize rebuilds retain normalized pan position and any enlarged plate; arrivals do not repeat. Resize is debounced by 200ms, and motion stops when the section/document is hidden.
+
+Browser regression coverage lives in `tests/log-field.cjs`. Run it with Node.js, Playwright available through `NODE_PATH`, and installed Microsoft Edge. It covers desktop drag/inertia, wheel axes/bounds/rails, hover, zoom/captions/neighbors/edge fitting, click/keyboard/Escape, language/theme/rebuild, unchanged non-LOG markup, fixed Close, native touch input/cancellation, and reduced motion. Optional `LOG_SCREENSHOTS` selects an existing output directory for screenshots. No libraries are added to the website runtime.
 
 Files changed in this visual revision: `styles/layout.css`, `styles/components.css`, `scripts/content.js`, `scripts/content-data.js`, `README.md`. No new pages or dependencies.
 

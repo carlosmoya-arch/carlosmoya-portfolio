@@ -4,6 +4,7 @@
       event.preventDefault();
       if (window.projectLightbox?.isOpen()) { window.projectLightbox.close(); return; }
       if (window.siteOverlays?.isOpen()) { window.siteOverlays.close(); return; }
+      if (window.SiteLog?.isZoomed()) { window.SiteLog.closeZoom(); return; }
       window.SiteViews.closeSection(); return;
     }
     if (event.target?.closest('input,textarea,select,[contenteditable]:not([contenteditable="false"])') || event.target?.isContentEditable || event.altKey || event.ctrlKey || event.metaKey || event.repeat) return;
