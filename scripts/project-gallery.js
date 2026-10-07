@@ -13,7 +13,11 @@
     dialog.setAttribute('aria-label', i.t('expandedImage'));
     dialog.innerHTML = `<button class="utility lightbox-close" aria-label="${i.t('close')}">×</button><div class="lightbox-image">${window.SiteImages.markup(button.dataset.imageId,true)}</div>`;
     const image = dialog.querySelector('img');
-    if (image) { image.sizes = '100vw'; image.src = window.SiteImages.root + window.SiteContent.images[button.dataset.imageId].base + '-2400.webp'; }
+    if (image) {
+      const item = window.SiteContent.images[button.dataset.imageId];
+      image.sizes = '100vw';
+      image.src = window.SiteImages.root + (item.src || item.base + '-2400.webp');
+    }
     dialog.querySelector('button').addEventListener('click', close);
     if (!dialog.open) dialog.showModal();
     requestAnimationFrame(() => dialog.classList.add('is-open'));

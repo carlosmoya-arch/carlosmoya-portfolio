@@ -83,7 +83,7 @@ Current contains three factual rows. About keeps a short profile, languages (Spa
 
 ### Add an observation to LOG
 
-`logEntries` is empty until real observations are supplied. Add a record in `scripts/content-data.js` with:
+The final temporary Pexels block in `scripts/content-data.js` currently supplies nine clearly labelled layout samples. Remove that block to restore the empty LOG before adding real observations. Sources, credits and removal instructions are in [assets/images/placeholders/README.md](assets/images/placeholders/README.md). Add a real record with:
 
 ```
 {

@@ -8,6 +8,8 @@
   function imageMarkup(id, hero = false, preview = false, sizes = '') {
     const item = data.images[id];
     if (!item || !item.available) return `<div class="image-placeholder" style="aspect-ratio:${item ? item.width + '/' + item.height : '3/2'}"><span>[${t(preview ? 'preview' : 'image')}]</span></div>`;
+    // Temporary references use one bounded local WebP, including in the lightbox.
+    if (item.src) return `<img src="${esc(root + item.src)}" width="${item.width}" height="${item.height}" alt="${text(item.alt)}" loading="${hero || preview ? 'eager' : 'lazy'}" decoding="async">${preview && item.placeholder ? `<span class="placeholder-preview-note">${text(item.previewLabel)}</span>` : ''}`;
     const base = root + item.base;
     return `<img src="${esc(base)}-1600.webp" srcset="${esc(base)}-800.webp 800w, ${esc(base)}-1600.webp 1600w, ${esc(base)}-2400.webp 2400w" sizes="${esc(sizes || (preview ? '360px' : '(max-width: 760px) calc(100vw - 2.3rem), (max-width: 1440px) calc(100vw - 4rem), 1376px'))}" width="${item.width}" height="${item.height}" alt="${text(item.alt)}" loading="${hero || preview ? 'eager' : 'lazy'}" decoding="async" ${hero ? 'fetchpriority="high"' : ''}>`;
   }

@@ -1,0 +1,190 @@
+[
+  {
+    "id": 5505125,
+    "name": "construction-site",
+    "photographer": "Mike van Schoonderwalt",
+    "url": "https://www.pexels.com/photo/construction-crane-on-a-building-site-5505125/",
+    "src": "assets/images/placeholders/construction-site.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 122822,
+    "downloadUrl": "https://images.pexels.com/photos/5505125/pexels-photo-5505125.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 36297579,
+    "name": "geometric-facade",
+    "photographer": "wal_ 172619",
+    "url": "https://www.pexels.com/photo/modern-geometric-building-facade-architecture-36297579/",
+    "src": "assets/images/placeholders/geometric-facade.webp",
+    "width": 1200,
+    "height": 797,
+    "bytes": 101322,
+    "downloadUrl": "https://images.pexels.com/photos/36297579/pexels-photo-36297579.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 34111830,
+    "name": "industrial-warehouse",
+    "photographer": "Mathias Reding",
+    "url": "https://www.pexels.com/photo/industrial-warehouse-front-in-dunkerque-france-34111830/",
+    "src": "assets/images/placeholders/industrial-warehouse.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 87508,
+    "downloadUrl": "https://images.pexels.com/photos/34111830/pexels-photo-34111830.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 13812407,
+    "name": "architectural-drawing",
+    "photographer": "Maksim Romashkin",
+    "url": "https://www.pexels.com/photo/architecture-construction-drawing-on-a-wooden-table-13812407/",
+    "src": "assets/images/placeholders/architectural-drawing.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 59466,
+    "downloadUrl": "https://images.pexels.com/photos/13812407/pexels-photo-13812407.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 7127096,
+    "name": "office-facade",
+    "photographer": "Shuaizhi Tian",
+    "url": "https://www.pexels.com/photo/modern-building-facade-7127096/",
+    "src": "assets/images/placeholders/office-facade.webp",
+    "width": 900,
+    "height": 1200,
+    "bytes": 103172,
+    "downloadUrl": "https://images.pexels.com/photos/7127096/pexels-photo-7127096.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 28753071,
+    "name": "wooden-staircase",
+    "photographer": "Martin Lang",
+    "url": "https://www.pexels.com/photo/modern-wooden-staircase-with-cozy-chair-28753071/",
+    "src": "assets/images/placeholders/wooden-staircase.webp",
+    "width": 800,
+    "height": 1200,
+    "bytes": 44356,
+    "downloadUrl": "https://images.pexels.com/photos/28753071/pexels-photo-28753071.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 36359185,
+    "name": "urban-symmetry",
+    "photographer": "Memet Öz",
+    "url": "https://www.pexels.com/photo/modern-urban-building-facade-with-symmetry-36359185/",
+    "src": "assets/images/placeholders/urban-symmetry.webp",
+    "width": 901,
+    "height": 1200,
+    "bytes": 137024,
+    "downloadUrl": "https://images.pexels.com/photos/36359185/pexels-photo-36359185.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 7078662,
+    "name": "symmetric-windows",
+    "photographer": "Laura Tancredi",
+    "url": "https://www.pexels.com/photo/facade-of-modern-geometric-building-with-symmetric-windows-7078662/",
+    "src": "assets/images/placeholders/symmetric-windows.webp",
+    "width": 800,
+    "height": 1200,
+    "bytes": 67580,
+    "downloadUrl": "https://images.pexels.com/photos/7078662/pexels-photo-7078662.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 10352693,
+    "name": "window-grid",
+    "photographer": "Valeria Palesska",
+    "url": "https://www.pexels.com/photo/modern-building-facade-10352693/",
+    "src": "assets/images/placeholders/window-grid.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 54216,
+    "downloadUrl": "https://images.pexels.com/photos/10352693/pexels-photo-10352693.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 7794413,
+    "name": "timber-detail",
+    "photographer": "Monstera Production",
+    "url": "https://www.pexels.com/photo/close-up-shot-of-wooden-stairs-7794413/",
+    "src": "assets/images/placeholders/timber-detail.webp",
+    "width": 800,
+    "height": 1200,
+    "bytes": 100278,
+    "downloadUrl": "https://images.pexels.com/photos/7794413/pexels-photo-7794413.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 9618455,
+    "name": "scale-model",
+    "photographer": "Ron Lach",
+    "url": "https://www.pexels.com/photo/architect-working-with-architectural-model-9618455/",
+    "src": "assets/images/placeholders/scale-model.webp",
+    "width": 800,
+    "height": 1200,
+    "bytes": 52418,
+    "downloadUrl": "https://images.pexels.com/photos/9618455/pexels-photo-9618455.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 29356973,
+    "name": "minimal-facade",
+    "photographer": "Shivansh Sharma",
+    "url": "https://www.pexels.com/photo/modern-architectural-building-facade-29356973/",
+    "src": "assets/images/placeholders/minimal-facade.webp",
+    "width": 676,
+    "height": 1200,
+    "bytes": 84886,
+    "downloadUrl": "https://images.pexels.com/photos/29356973/pexels-photo-29356973.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 36197789,
+    "name": "monochrome-facade",
+    "photographer": "Juan Pablo Daniel",
+    "url": "https://www.pexels.com/photo/modern-geometric-black-and-white-building-facade-36197789/",
+    "src": "assets/images/placeholders/monochrome-facade.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 82856,
+    "downloadUrl": "https://images.pexels.com/photos/36197789/pexels-photo-36197789.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 15472417,
+    "name": "urban-volumes",
+    "photographer": "Quang Lự Đỗ",
+    "url": "https://www.pexels.com/photo/modern-architecture-facade-15472417/",
+    "src": "assets/images/placeholders/urban-volumes.webp",
+    "width": 1200,
+    "height": 817,
+    "bytes": 58444,
+    "downloadUrl": "https://images.pexels.com/photos/15472417/pexels-photo-15472417.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 14455165,
+    "name": "angular-facade",
+    "photographer": "Jon",
+    "url": "https://www.pexels.com/photo/facade-of-a-modern-architecture-building-14455165/",
+    "src": "assets/images/placeholders/angular-facade.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 77680,
+    "downloadUrl": "https://images.pexels.com/photos/14455165/pexels-photo-14455165.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 26613413,
+    "name": "chair-object",
+    "photographer": "Jan van der Wolf",
+    "url": "https://www.pexels.com/photo/empty-chair-on-floor-26613413/",
+    "src": "assets/images/placeholders/chair-object.webp",
+    "width": 1200,
+    "height": 800,
+    "bytes": 16640,
+    "downloadUrl": "https://images.pexels.com/photos/26613413/pexels-photo-26613413.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  },
+  {
+    "id": 7794429,
+    "name": "concrete-texture",
+    "photographer": "Monstera Production",
+    "url": "https://www.pexels.com/photo/close-up-shot-of-concrete-pavement-7794429/",
+    "crop": "square",
+    "src": "assets/images/placeholders/concrete-texture.webp",
+    "width": 800,
+    "height": 800,
+    "bytes": 168046,
+    "downloadUrl": "https://images.pexels.com/photos/7794429/pexels-photo-7794429.jpeg?auto=compress&cs=tinysrgb&w=1200&h=1200&fit=max"
+  }
+]
