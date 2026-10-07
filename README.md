@@ -4,23 +4,19 @@ Open `index.html` directly in a browser. No installation, build step or server i
 
 ## Content and languages
 
-Edit `scripts/content-data.js`. It contains:
-- `navigation`: shared destinations and keyboard keys;
-- `ui.en`, `ui.de`, `ui.es`: interface text;
-- `work` and `education`: CV chronology;
-- `projects`: project records;
-- `tools`: practice, training and exploration;
-- `images`: image metadata.
+Editorial records now live in `content/projects.js`, `content/log.js`, `content/work.js`, `content/about.js` and `content/images.js`. New short labels live in `content/texts.js`. These files contain data only and work without a server or build step. See [the content guide](content/README.md) for schemas, sources, placeholders and editorial caveats.
+
+`scripts/content-data.js` retains existing shared navigation, translations, CURRENT, education and TOOLS content. Rendering and interaction code remain in `scripts/`.
 
 Translated values use `{ en: '…', de: '…', es: '…' }`. Proper project names stay unchanged. `scripts/i18n.js` stores the selected language locally; English is the initial default. The HTML language, page title and accessibility labels follow the selection.
 
-The professional source is Carlos Moya_CV DE_A4_2607_s.pdf. Individual project dates are omitted where the CV does not supply them. Wolf's 2021–2026 period and completed status come from previously supplied information. Its description is explicitly marked `descriptionProvisional: true`. No personal contact details from the CV are published.
+The professional source is Carlos Moya_CV DE_A4_2607_s.pdf, supplemented by the approved portfolio decisions. Unsupported involvement periods remain null. Wolf's retained 2021–2026 is project chronology, not Carlos's personal involvement period; its description stays provisional. No personal contact details from the CV are published.
 
 ## Add a project
 
-Add a record to the `projects` array in the final part of `content-data.js`. Use a unique `id`, `name`, translated `location`, `type` and `role`. Optional fields: `period`, `lph`, `area` (number), `areaKey` (`gfa`, `livingArea`, `complexArea` or `area`), `value` (EUR number), `valueGreaterThan` (optional), `valueKey`, `statusKey`, `descriptionKey`, `descriptionProvisional`, `images` and `previewImage`.
+Add a record to `content/projects.js`, following the existing schema: `id`, `slug`, `selected`, `name`, `location`, `type`, `scope`, `projectData`, `assets`, `sources` and `notes`. Keep Carlos's involvement in `scope` and objective building information in `projectData`. Preserve literal BGF/GF/WF area terms.
 
-Leave unknown fields out. The order of the array determines the archive and next-project navigation. Each record automatically opens `pages/project.html?id=YOUR-ID`. An optional `url` selects a dedicated page; Wolf retains `pages/wolf-besucherzentrum.html`.
+Leave unknown fields out. Array order determines the selected index and next-project navigation; only `selected: true` records appear. Each record opens `pages/project.html?id=YOUR-ID`; an optional `url` preserves dedicated pages such as Wolf's. The current ten-project order is provisional; no completion-date sorting is applied.
 
 ## Add a real image
 
@@ -34,13 +30,13 @@ assets/images/projects/wolf-besucherzentrum/project-01-2400.webp
 
 The suffix is the exported width in pixels. Do not upscale small originals: adapt both the available widths and the `srcset` in `content.js` if necessary.
 
-In `images`, assign a unique image key, the `base` path without size suffix or extension, real `width` and `height` (same aspect ratio as all exports), descriptive `alt` in all three languages, and `available: true`. Add that key to the project's ordered `images` array. The first image becomes the eager-loaded hero; subsequent images load lazily. No layout change is required for more images or different proportions.
+In `content/images.js`, assign a unique image key, the `base` path without size suffix or extension, real `width` and `height`, descriptive multilingual `alt`, and `available: true`. Reference that `imageId` in the project's ordered `assets` with source and credit per asset. Alternatively supply a bounded local `src` and dimensions directly on the asset. Assets marked `usage: "hover-only"` do not become gallery photographs.
 
 Before photographs exist, `available: false` renders a clearly identified placeholder without attempting missing files. Replace the provisional image dimensions when uploading the actual exports. No artificial images are included.
 
 ## Assign a hover photograph
 
-Set a project's `previewImage` to one image key from `images`. The preview shows just that image when hovering over the project name on devices with a precise pointer. Without an available image it shows a placeholder. Touch navigation works without hover.
+Designate one project asset as `type: "cover"`. It supplies the existing floating preview on precise pointers. Current Pexels covers remain temporary, with per-asset credits and `usage: "hover-only"`. Touch navigation works without hover.
 
 ## Shared behavior and styling
 
@@ -83,11 +79,12 @@ Current contains three factual rows. About keeps a short profile, languages (Spa
 
 ### Add an observation to LOG
 
-The final temporary Pexels block in `scripts/content-data.js` supplies 51 numbered layout-test plates, reusing the 17 local reference photographs three times. These are explicitly temporary samples, not actual observations. Remove that block to restore the empty LOG before adding real observations. Sources and credits are in [assets/images/placeholders/README.md](assets/images/placeholders/README.md). Add a real record with:
+`content/log.js` retains 51 temporary layout-test plates reusing 17 Pexels references. Remove those records before publishing real observations. Entry 052 reserves Umspannwerk Schwabing, unpublished and without an invented image. Sources and credits are in [assets/images/placeholders/README.md](assets/images/placeholders/README.md). Add a real record with:
 
 ```
 {
   number: '001',
+  published: true,
   title: { en: '…', de: '…', es: '…' },
   location: { en: '…', de: '…', es: '…' }, // optional
   date: '2026',
@@ -105,11 +102,11 @@ Use one of SITE, ARCHITECTURE, DETAIL, MATERIAL, DESIGN, OBJECT, PROCESS, REFERE
 
 The field starts centered and distributes plates to the shortest column. Columns are 172px wide with 48px horizontal gaps, or 132px/30px below 700px, with 44px vertical gaps and deterministic offsets up to 190px. Column count balances horizontal and vertical travel using the quadratic from the supplied specification. Normal pan has 96px boundary slack. Drag uses pointer capture and tracks 1:1; release velocity is multiplied by 12, decays by .94 per 60Hz frame and interpolates by .16, normalized for frame rate. Wheel/trackpad pans both axes at twice the event delta; Ctrl+wheel remains available for browser zoom. Rails show visible fractions and fade after 1.1 seconds of inactivity.
 
-Images enter once with the specified .5s opacity/.55s scale transitions and up to .45s delay. Initially visible plates appear immediately; later plates use IntersectionObserver with 45% vertical/40% horizontal margins. The field settles from .9 to 1 over 950ms. Clicking without a drag over 6px enlarges a frame, moves its caption down and displaces neighboring plates radially. Clicking the same plate or empty space, or pressing Escape, closes it. Keyboard users can focus/activate plates and pan with arrow keys. Touch uses the same pointer model, including cancellation.
+Images enter once with .5s opacity/.55s scale transitions and up to .45s delay. First-screen plates stagger on the first mount; subsequent discoveries use IntersectionObserver with 45% vertical/40% horizontal margins. Language changes rebuild/recenter with fresh arrival delays; resize and same-language reopen restore immediately. The field settles from .9 to 1 over 950ms. Clicking without a drag over 6px enlarges a frame, moves its caption down and displaces every other plate radially without a reach cutoff. Zoom clearance is 32px horizontally and 44px vertically within the LOG viewport. Rails are flush/full-length with a 24px minimum thumb. Release after a hold uses the last sampled velocity. Clicking the same plate or empty space, or pressing Escape, closes zoom. Keyboard users can focus/activate plates and pan with arrow keys. Touch retains the same pointer model and cancellation.
 
 Record fields supported by LOG: `number`, translated `title`, translated `location`, `date` or `year`, `category`, `images` (first image is the plate), and optional direct `src`, `width`, `height`, `zoomSrc`, translated `alt`, `credit`, `sourceUrl`, and translated `text`. Image dimensions/source/credit otherwise come from the referenced image metadata. Placeholder dates remain “—” rather than inventing observation dates. No video support is included.
 
-Adaptations: LOG uses the existing site chrome, fonts, theme colors and language styling rather than the reference site's branding, page title/footer, language font treatment or navigation veil. Existing bounded local WebP files (maximum side 1200px) are reused for zoom; future records can supply `zoomSrc` for a larger local export. Zoom is normally clamped to 1.5–3.4 but also constrained to fit very short/narrow windows. Boundary clearance expands only while an exterior plate is enlarged and returns to 96px when closed. Reduced motion also removes inertia and interpolation, in addition to the specified CSS animations. Language/resize rebuilds retain normalized pan position and any enlarged plate; arrivals do not repeat. Resize is debounced by 200ms, and motion stops when the section/document is hidden.
+Adaptations: LOG uses the existing site chrome, fonts, theme colors and language styling rather than the reference site's branding, page title/footer, language font treatment or navigation veil. Existing bounded local WebP files (maximum side 1200px) are reused for zoom; future records can supply `zoomSrc` for a larger local export. Zoom is normally clamped to 1.5–3.4 but also constrained to fit very short/narrow windows. Boundary clearance expands only while an exterior plate is enlarged and returns to 96px when closed. Reduced motion removes inertia, interpolation and CSS animations. Resize rebuilds retain normalized pan position and zoom without repeating arrivals; language rebuilds deliberately reset/re-stagger. Resize is debounced by 200ms, and motion stops when the section/document is hidden.
 
 Browser regression coverage lives in `tests/log-field.cjs`. Run it with Node.js, Playwright available through `NODE_PATH`, and installed Microsoft Edge. It covers desktop drag/inertia, wheel axes/bounds/rails, hover, zoom/captions/neighbors/edge fitting, click/keyboard/Escape, language/theme/rebuild, unchanged non-LOG markup, fixed Close, native touch input/cancellation, and reduced motion. Optional `LOG_SCREENSHOTS` selects an existing output directory for screenshots. No libraries are added to the website runtime.
 

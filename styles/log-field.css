@@ -15,7 +15,7 @@
 .log-frame:hover { opacity: 1; }
 .log-plate.is-zoomed .log-frame { cursor: zoom-out; }
 .log-frame img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1); transition: transform .5s cubic-bezier(.33,1,.68,1); pointer-events: none; }
-.log-caption { padding-top: 8px; font-family: var(--serif); font-size: 9px; font-weight: normal; line-height: 1.5; letter-spacing: .019em; text-transform: uppercase; overflow-wrap: anywhere; transform: translateY(var(--caption-shift, 0px)); transition: transform .55s cubic-bezier(.33,1,.68,1); }
+.log-caption { padding-top: 8px; font-family: var(--serif); font-size: var(--text-log-caption); font-weight: normal; line-height: 1.5; letter-spacing: .019em; text-transform: uppercase; overflow-wrap: anywhere; transform: translateY(var(--caption-shift, 0px)); transition: transform .55s cubic-bezier(.33,1,.68,1); }
 .log-plate-number { font-family: monospace; margin-right: .5em; }
 .log-caption-sub { display: block; opacity: .45; transition: opacity .3s ease; }
 .log-rail { position: absolute; background: var(--line); pointer-events: none; opacity: 0; transition: opacity .4s ease; z-index: 20; }

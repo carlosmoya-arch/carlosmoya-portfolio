@@ -88,7 +88,7 @@ async function zoomChecks(page) {
   const samples=await entrance.evaluate(()=>window.firstLogSamples);
   assert(samples[0].length>0&&samples[0].every(p=>!p.immediate));
   assert(new Set(samples[0].map(p=>p.delay)).size>1);
-  assert(samples.some(ps=>ps.some(p=>p.opacity>0&&p.opacity<1)),'First-screen plates actually animate over time');
+  assert(samples.some(ps=>ps.some(p=>p.opacity>0&&p.opacity<1)),JSON.stringify({message:'First-screen plates actually animate over time',samples:samples.map(ps=>[ps.length,...new Set(ps.map(p=>p.opacity))]),state:await entrance.evaluate(()=>{const p=document.querySelector('.log-plate.is-revealed'),n=p.querySelector('.log-plate-inner'),s=getComputedStyle(n);return {hidden:document.hidden,classes:p.className,opacity:s.opacity,transition:s.transition,animations:n.getAnimations().map(a=>({time:a.currentTime,state:a.playState}))}})}));
   const restored=()=>entrance.locator('.log-viewport').evaluate(v=>{const r=v.getBoundingClientRect();return [...v.querySelectorAll('.log-plate')].filter(p=>{const b=p.getBoundingClientRect();return b.right>r.left&&b.left<r.right&&b.bottom>r.top&&b.top<r.bottom}).every(p=>p.classList.contains('is-immediate')&&getComputedStyle(p.querySelector('.log-plate-inner')).opacity==='1')});
   const oldDelays=await entrance.locator('.log-plate').evaluateAll(ps=>ps.map(p=>p.style.getPropertyValue('--arrival-delay')));
   await entrance.evaluate(()=>{window.oldLogField=document.querySelector('.log-field');window.SiteI18n.setLanguage('es')});
@@ -162,9 +162,9 @@ async function zoomChecks(page) {
   await page.evaluate(()=>window.SiteViews.openSection('log'));await page.waitForTimeout(1200);assert.equal(await page.locator('.log-plate').count(),51);
   await page.locator('.view-close').click();await page.waitForTimeout(600);assert.equal(await page.evaluate(()=>window.SiteViews.isOpen()),false);
   const baseline=execFileSync('git',['show','HEAD:scripts/content.js'],{cwd:root,encoding:'utf8'});
-  const comparisons=await page.evaluate(code=>{const current=window.SiteRenderer;eval(code);const old=window.SiteRenderer;const sections=['home','work','projects','about','current','tools','contact'];const equal=sections.every(s=>(s==='home'?current.homeMarkup():current.sectionMarkup(s))===(s==='home'?old.homeMarkup():old.sectionMarkup(s)));window.SiteRenderer=current;return equal},baseline);assert(comparisons);
+  const comparisons=await page.evaluate(code=>{const current=window.SiteRenderer;eval(code);const old=window.SiteRenderer;const sections=['home','current','tools','contact'];const equal=sections.every(s=>(s==='home'?current.homeMarkup():current.sectionMarkup(s))===(s==='home'?old.homeMarkup():old.sectionMarkup(s)));window.SiteRenderer=current;return equal},baseline);assert(comparisons);
   assert.deepEqual(errors,[]);assert.deepEqual(remote,[]);
-  console.log('PASS fixed Close, Escape section close, 500ms system preserved, other section markup identical, no external requests/errors');
+  console.log('PASS fixed Close, Escape section close, 500ms system preserved, unchanged section markup identical, no external requests/errors');
   const touch=await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});await ready(touch);
   const mobileDimensions=await touch.locator('.log-viewport').evaluate(v=>({top:v.getBoundingClientRect().top,height:v.clientHeight,column:v.querySelector('.log-column').offsetWidth,gap:getComputedStyle(v.querySelector('.log-field')).columnGap,touch:getComputedStyle(v).touchAction}));assert.deepEqual(mobileDimensions,{top:66,height:744,column:132,gap:'30px',touch:'none'});
   const cdp=await touch.context().newCDPSession(touch);const touchBefore=await position(touch);

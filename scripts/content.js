@@ -5,6 +5,15 @@
   const t = key => esc(i18n.t(key)), text = value => esc(i18n.text(value));
   const href = project => root + (project.url || 'pages/project.html?id=' + encodeURIComponent(project.id));
   const formatArea = value => new Intl.NumberFormat(i18n.language).format(value) + ' m²';
+  const selectedProjects = () => data.projects.filter(project => project.selected === true);
+  // Adapt editorial assets to the shared image/preview/lightbox helpers.
+  data.projects.forEach(project => (project.assets || []).forEach((asset, index) => {
+    asset.imageId ||= project.id + '-asset-' + index;
+    if (asset.src) data.images[asset.imageId] = {
+      ...data.images[asset.imageId], ...asset, available: asset.available !== false,
+      sourceUrl: asset.source, previewLabel: data.images[asset.imageId]?.previewLabel || data.ui.en.preview
+    };
+  }));
   function imageMarkup(id, hero = false, preview = false, sizes = '') {
     const item = data.images[id];
     if (!item || !item.available) return `<div class="image-placeholder" style="aspect-ratio:${item ? item.width + '/' + item.height : '3/2'}"><span>[${t(preview ? 'preview' : 'image')}]</span></div>`;
@@ -15,12 +24,20 @@
   }
   window.SiteImages = { markup: imageMarkup, root };
   function facts(project) {
+    const scope = project.scope || {}, objective = project.projectData || {};
+    const editorial = project.publicMetadata || {};
+    const principalArea = scope.area || objective.areas?.[0];
+    const term = Object.hasOwn(editorial, 'areaTerm') ? editorial.areaTerm : principalArea?.term;
+    const area = principalArea ? `${principalArea.approximate ? i18n.t('approximate') + ' ' : ''}${formatArea(principalArea.value)}${term ? ' ' + term : ''}` : null;
     const fields = [
-      ['type', i18n.text(project.type)], ['role', i18n.text(project.role)], ['lph', project.lph],
-      [project.areaKey || 'area', project.area ? formatArea(project.area) : null],
-      [project.valueKey || 'value', project.value ? `${project.valueGreaterThan ? '> ' : ''}${new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(project.value)}` : null], ['status', project.statusKey ? i18n.t(project.statusKey) : null]
+      [i18n.t('type'), i18n.text(editorial.type || project.type)],
+      [i18n.t('office'), Object.hasOwn(editorial, 'office') ? editorial.office : project.office],
+      [i18n.t('role'), i18n.text(editorial.role)],
+      [i18n.t('lph'), editorial.lph || scope.lph || objective.lph],
+      [i18n.t('area'), area],
+      [i18n.t('year'), objective.completed]
     ];
-    return fields.filter(([,value]) => value).map(([key,value]) => `<div><dt>${t(key)}</dt><dd>${esc(value)}</dd></div>`).join('');
+    return fields.filter(([,value]) => value).map(([label,value]) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('');
   }
   function homeMarkup() {
     return `<nav class="home-index" aria-label="${t('navigation')}">${data.navigation.map((item,n) => `<a href="${root}pages/${item.id}.html" data-open-view="${item.id}"><span>${item.number}</span><span>${esc(i18n.t('sections')[n])}</span><span class="index-note">${esc(i18n.t('descriptors')[n])}</span></a>`).join('')}</nav>`;
@@ -28,11 +45,12 @@
   function sectionMarkup(page, projectId) {
       let body = '';
       if (page === 'projects') {
-        body = `<ol class="project-index">${data.projects.map(project => `<li class="project-row"><span class="project-period">${esc(project.period || '—')}</span><div><h2><a href="${esc(href(project))}" data-project-preview="${esc(project.id)}">${esc(project.name)}</a></h2><p class="project-location">${text(project.location)}</p><dl class="project-facts">${facts(project)}</dl></div></li>`).join('')}</ol>`;
+        body = `<ol class="project-index">${selectedProjects().map(project => `<li class="project-row"><span class="project-period">${esc(project.period || '—')}</span><div><h2><a href="${esc(href(project))}" data-project-preview="${esc(project.id)}">${esc(project.name)}</a></h2><p class="project-location">${text(project.location)}</p><dl class="project-facts">${facts(project)}</dl></div></li>`).join('')}</ol>`;
       } else if (page === 'work') {
-        body = `<ol class="timeline">${data.work.map(job => `<li><span class="period">${esc(job.from)}–${job.to ? esc(job.to) : t('present')}</span><div><h2>${text(job.name)}</h2>${job.role || job.roleKey ? `<p>${job.roleKey ? t(job.roleKey) : text(job.role)}</p>` : ''}<p class="secondary">${text(job.location)}</p></div></li>`).join('')}</ol>`;
+        body = `<ol class="timeline">${data.work.map(job => `<li><span class="period">${esc(job.from)}–${job.to ? esc(job.to) : t('present')}</span><div><h2>${text(job.name)}</h2>${job.role || job.roleKey ? `<p>${job.roleKey ? t(job.roleKey) : text(job.role)}</p>` : ''}${job.location ? `<p class="secondary">${text(job.location)}</p>` : ''}</div></li>`).join('')}</ol>`;
       } else if (page === 'about') {
         body = `<div class="page-body"><p class="intro">${t('aboutIntro')}</p><dl class="profile-list"><div><dt>${t('location')}</dt><dd>Valencia · Munich</dd></div><div><dt>${t('languages')}</dt><dd>${i18n.t('languageNames').map((name,n) => `${esc(name)} — ${n === 0 ? t('native') : n === 1 ? 'C2' : 'C1'}`).join('<br>')}</dd></div><div><dt>${t('education')}</dt><dd>${data.education.map(item => `<p><span class="secondary">${esc(item.period)}</span><br>${t(item.key)}<br>${esc(item.institution)}</p>`).join('')}</dd></div><div><dt>${t('experience')}</dt><dd>${t('experienceSummary')}<br><a class="text-link" href="${root}pages/work.html" data-open-view="work">${esc(i18n.t('sections')[1])} →</a></dd></div></dl></div>`;
+        body = body.replace('</dl></div>', `<div><dt>${t('collaborators')}</dt><dd>${data.about.collaborators.map(esc).join(' · ')}</dd></div></dl></div>`);
       } else if (page === 'tools') {
         body = `<div class="page-body">${data.tools.map(group => `<section class="tool-section"><p class="eyebrow">${t(group.group === 'use' ? 'toolsUse' : 'toolsExplore')}</p><h2>${esc(i18n.t('toolCategories')[group.category])}</h2>${group.group === 'explore' ? `<p class="secondary">${t('toolsExploreIntro')}</p>` : ''}<ul class="tool-list">${group.names.map(name => `<li>${esc(name)}</li>`).join('')}</ul>${group.training ? `<h3>${t('training')}</h3><p class="secondary">${group.training.map(esc).join(' · ')}</p>` : ''}</section>`).join('')}</div>`;
       } else if (page === 'current') {
@@ -43,13 +61,13 @@
         body = `<div class="archive-empty"><p>${t('contactPending')}</p></div>`;
       } else {
         const id = projectId;
-        const project = data.projects.find(item => item.id === id);
+        const project = selectedProjects().find(item => item.id === id);
         if (project) {
           document.title = `${project.name} — Carlos Moya`;
           const projectSection = esc(i18n.t('sections')[2]);
-          const images = project.images || [];
+          const images = (project.assets || []).filter(asset => asset.usage !== 'hover-only' && asset.imageId).map(asset => asset.imageId);
           const image = (imageId,n) => `<figure class="project-image ${n === 0 ? 'project-hero' : ''}"><button class="image-trigger" data-image-id="${esc(imageId)}" aria-label="${t('openImage')}: ${text(data.images[imageId].alt)}">${imageMarkup(imageId,n === 0)}</button><figcaption>${String(n+1).padStart(2,'0')}</figcaption></figure>`;
-          body = `<header class="project-heading"><h1>${esc(project.name)}</h1><p>${text(project.location)}${project.period ? `<br>${esc(project.period)}` : ''}</p></header>${images.length ? image(images[0],0) : ''}<div class="project-information"><dl class="project-facts">${facts(project)}</dl><div>${project.descriptionKey ? `<section data-content-status="${project.descriptionProvisional ? 'provisional' : 'final'}"><h2>${t('project')}</h2><p>${t(project.descriptionKey)}</p></section>` : ''}<section><h2>${t('role')}</h2><p>${text(project.role)}</p></section></div></div>${images.length > 1 ? `<section class="project-gallery" aria-label="${t('gallery')}">${images.slice(1).map((id,n) => image(id,n+1)).join('')}</section>` : ''}<nav class="project-pagination" aria-label="${t('navigation')}"><a href="${root}pages/projects.html" data-open-view="projects">${projectSection}</a>${(() => {const next = data.projects[data.projects.indexOf(project)+1];return next ? `<a href="${esc(href(next))}">${t('next')} →</a>` : `<span class="secondary">${t('next')} →</span>`;})()}</nav>`;
+          body = `<header class="project-heading"><h1>${esc(project.name)}</h1><p>${text(project.location)}${project.period ? `<br>${esc(project.period)}` : ''}</p></header>${images.length ? image(images[0],0) : ''}<div class="project-information"><dl class="project-facts">${facts(project)}</dl><div>${project.descriptionKey ? `<section data-content-status="${project.descriptionProvisional ? 'provisional' : 'final'}"><h2>${t('project')}</h2><p>${t(project.descriptionKey)}</p></section>` : ''}<section><h2>${t('role')}</h2><p>${text(project.publicMetadata?.role)}</p></section></div></div>${images.length > 1 ? `<section class="project-gallery" aria-label="${t('gallery')}">${images.slice(1).map((id,n) => image(id,n+1)).join('')}</section>` : ''}<nav class="project-pagination" aria-label="${t('navigation')}"><a href="${root}pages/projects.html" data-open-view="projects">${projectSection}</a>${(() => {const selection = selectedProjects(); const next = selection[selection.indexOf(project)+1];return next ? `<a href="${esc(href(next))}">${t('next')} →</a>` : `<span class="secondary">${t('next')} →</span>`;})()}</nav>`;
         } else body = `<p>${t('projectPending')}</p><a href="${root}pages/projects.html" data-open-view="projects">${esc(i18n.t('sections')[2])}</a>`;
       }
     return body;

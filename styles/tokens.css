@@ -2,7 +2,9 @@
   color-scheme: light;
   --paper: #f7f6f2; --paper-raised: #efeee9; --ink: #191916; --muted: #696861; --line: rgba(25,25,22,.13);
   --serif: "Times New Roman", Times, Georgia, serif; --sans: Arial, Helvetica, sans-serif;
-  --text-xs: .68rem; --text-sm: .78rem; --text-base: .94rem; --text-lg: 1.25rem;
+  --text-xs: .75rem; --text-sm: .865rem; --text-base: 1.04rem; --text-lg: 1.39rem;
+  --text-body: .82rem; --text-metadata: .795rem; --text-label: .78rem;
+  --text-project: .98rem; --text-control: .66rem; --text-log-caption: 9.8px;
   --space-1: .35rem; --space-2: .7rem; --space-3: 1rem; --space-4: 1.5rem; --space-5: 2rem; --space-6: 3rem; --space-7: 5rem; --space-8: 8rem;
   --view-fade: 500ms; --item-fade: 400ms; --hover-speed: 250ms; --load-fade: 400ms;
   --speed-fast: 200ms; --speed: 240ms; --speed-slow: 380ms; --ease: ease;

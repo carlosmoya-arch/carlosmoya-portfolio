@@ -8,7 +8,7 @@
     if (!canHover.matches) return;
     const project = window.SiteContent.projects.find(item => item.id === link.dataset.projectPreview);
     if (!project) return;
-    preview.innerHTML = window.SiteImages.markup(project.previewImage,false,true);
+    preview.innerHTML = window.SiteImages.markup(project.assets?.find(asset => asset.type === 'cover')?.imageId,false,true);
     const rect = link.getBoundingClientRect();
     const width = Math.min(360,innerWidth-32), height = Math.min(280,innerHeight-32);
     preview.style.width = width + 'px'; preview.style.height = height + 'px';

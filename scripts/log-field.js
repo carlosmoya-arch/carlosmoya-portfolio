@@ -42,6 +42,7 @@
     measuringColumn.className = 'log-column'; field.append(measuringColumn);
 
     window.SiteContent.logEntries.forEach((entry, index) => {
+      if (entry.published === false) return;
       const image = window.SiteContent.images[entry.images?.[0]] || {};
       const source = entry.src || image.src || (image.available && image.base ? image.base + '-800.webp' : '');
       if (!source) return;
@@ -49,13 +50,13 @@
       if (!(w > 0 && h > 0)) return;
       const number = entry.number || String(index + 1).padStart(3, '0');
       const category = i18n.t('logCategories')[window.SiteContent.logCategories.indexOf(entry.category)] || entry.category;
-      const sub = [text(entry.location) || '—', entry.date || entry.year || '—', category].join(' · ');
+      const sub = [text(entry.location) || '—', entry.date || entry.year || '—'].join(' · ') + ' / ' + category;
       const figure = document.createElement('figure');
       figure.className = 'log-plate'; figure.dataset.logNumber = number;
       figure.style.setProperty('--arrival-delay', (Math.random() * .45).toFixed(3) + 's');
       const captionId = 'log-caption-' + number;
       const title = text(entry.title), credit = entry.credit || image.credit || '';
-      const description = [entry.placeholder || image.placeholder ? language.reference : '', credit ? credit + ' / Pexels' : '', text(entry.text)].filter(Boolean).join(' ');
+      const description = [entry.placeholder || image.placeholder ? language.reference : '', credit ? credit + (entry.placeholder || image.placeholder ? ' / Pexels' : '') : '', text(entry.text)].filter(Boolean).join(' ');
       const local = path => /^(?:https?:|data:|blob:)/.test(path) ? path : window.SiteImages.root + path;
       figure.innerHTML = `<div class="log-plate-inner"><button class="log-frame" style="aspect-ratio:${w}/${h}" aria-label="${esc(language.zoom + ': ' + number + ' — ' + title)}" aria-describedby="${esc(captionId)}" aria-expanded="false"><img src="${esc(local(source))}" width="${w}" height="${h}" alt="${esc(text(entry.alt || image.alt) || title)}" loading="lazy" decoding="async" fetchpriority="low" draggable="false"></button><figcaption id="${esc(captionId)}" class="log-caption"><span class="log-plate-number">${esc(number)}</span>${esc(title)}<span class="log-caption-sub">${esc(sub)}</span><span class="sr-only">${esc(description)}</span></figcaption></div>`;
       measuringColumn.append(figure);
