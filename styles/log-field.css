@@ -20,8 +20,8 @@
 .log-caption-sub { display: block; opacity: .45; transition: opacity .3s ease; }
 .log-rail { position: absolute; background: var(--line); pointer-events: none; opacity: 0; transition: opacity .4s ease; z-index: 20; }
 .log-rail span { position: absolute; display: block; background: var(--ink); }
-.log-rail-x { left: 0; right: 12px; bottom: 2px; height: 1px; }
-.log-rail-y { top: 0; bottom: 12px; right: 2px; width: 1px; }
+.log-rail-x { left: 0; right: 0; bottom: 0; height: 1px; }
+.log-rail-y { top: 0; bottom: 0; right: 0; width: 1px; }
 .log-rail-x span { height: 1px; left: 0; }
 .log-rail-y span { width: 1px; top: 0; }
 .log-viewport.is-moving .log-rail { opacity: 1; }

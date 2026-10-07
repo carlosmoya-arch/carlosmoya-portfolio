@@ -8,13 +8,17 @@
     de: { instructions: 'In alle Richtungen ziehen oder mit dem Mausrad navigieren. Pfeiltasten verschieben. Bild anklicken oder Enter drücken zum Vergrößern. Escape schließt zuerst den Zoom, dann LOG.', reference: 'Temporäre Pexels-Referenz; kein Projekt von Carlos Moya.', zoom: 'Bild vergrößern' },
     es: { instructions: 'Arrastra o usa la rueda en cualquier dirección. Las flechas desplazan. Haz clic o pulsa Enter sobre una imagen para ampliarla. Escape cierra primero el zoom y después LOG.', reference: 'Referencia temporal de Pexels; no es un proyecto de Carlos Moya.', zoom: 'Ampliar imagen' }
   };
-  let current, saved, resizeTimer;
+  let current, saved, resizeTimer, fieldLanguage;
   const arrived = new Set();
 
   function mount() {
     if (current) { saved = current.snapshot(); current.destroy(); current = null; }
     const viewport = document.querySelector('.log-viewport');
-    if (viewport) current = createField(viewport, saved);
+    if (viewport) {
+      if (fieldLanguage && fieldLanguage !== window.SiteI18n.language) { saved = null; arrived.clear(); }
+      fieldLanguage = window.SiteI18n.language;
+      current = createField(viewport, saved);
+    }
   }
 
   function createField(viewport, previous) {
@@ -99,11 +103,11 @@
 
     function paint() {
       pan.style.transform = `translate3d(${x}px,${y}px,0)`;
-      const lengths = [Math.max(0, width - 12), Math.max(0, height - 12)];
+      const lengths = [width, height];
       [fieldWidth, fieldHeight].forEach((size, index) => {
         const thumb = rails[index].firstElementChild, length = lengths[index];
         const fraction = Math.min(1, (index ? height : width) / Math.max(1, size));
-        const thumbSize = Math.min(length, Math.max(18, length * fraction));
+        const thumbSize = Math.min(length, Math.max(24, length * fraction));
         const range = index ? bounds.maxY - bounds.minY : bounds.maxX - bounds.minX;
         const position = range ? ((index ? bounds.maxY - y : bounds.maxX - x) / range) * (length - thumbSize) : 0;
         thumb.style[index ? 'height' : 'width'] = thumbSize + 'px';
@@ -167,8 +171,8 @@
       let nextX = x, nextY = y;
       const left = plate.left + x - growX, right = plate.left + x + plate.w + growX;
       const top = plate.top + y - growY, bottom = plate.top + y + plate.height + growY;
-      if (left < 16) nextX += 16 - left; else if (right > width - 16) nextX -= right - width + 16;
-      if (top < 16) nextY += 16 - top; else if (bottom > height - 16) nextY -= bottom - height + 16;
+      if (left < 32) nextX += 32 - left; else if (right > width - 32) nextX -= right - width + 32;
+      if (top < 44) nextY += 44 - top; else if (bottom > height - 44) nextY -= bottom - height + 44;
       moveTo(nextX, nextY);
     }
     function openZoom(plate) {
@@ -176,12 +180,12 @@
       closeZoom(false); reveal(plate, true); vx = vy = 0;
       zoomed = plate; plate.figure.classList.add('is-zoomed'); plate.button.setAttribute('aria-expanded', 'true');
       const desired = Math.min((mobile.matches ? .78 : .40) * innerWidth / plate.w, (mobile.matches ? .52 : .60) * innerHeight / plate.h);
-      const scale = Math.min(clamp(desired, 1.5, 3.4), (width - 32) / plate.w, (height - (plate.height - plate.h) - 32) / plate.h);
+      const scale = Math.min(clamp(desired, 1.5, 3.4), (width - 64) / plate.w, (height - (plate.height - plate.h) - 88) / plate.h);
       const growX = (scale - 1) * plate.w / 2, growY = (scale - 1) * plate.h / 2;
       // Temporary extra clearance lets even outermost plates fit while enlarged.
-      bounds.maxX = Math.max(96, growX + 16); bounds.maxY = Math.max(96, growY + 16);
-      bounds.minX = Math.min(normalBounds.minX, width - fieldWidth - growX - 16);
-      bounds.minY = Math.min(normalBounds.minY, height - fieldHeight - growY - 16);
+      bounds.maxX = Math.max(96, growX + 32); bounds.maxY = Math.max(96, growY + 44);
+      bounds.minX = Math.min(normalBounds.minX, width - fieldWidth - growX - 32);
+      bounds.minY = Math.min(normalBounds.minY, height - fieldHeight - growY - 44);
       plate.figure.style.setProperty('--zoom', scale);
       plate.figure.style.setProperty('--caption-shift', growY + 'px');
       const centerX = plate.left + plate.w / 2, centerY = plate.top + plate.h / 2;
@@ -221,10 +225,10 @@
     });
     function release(event, cancelled = false) {
       if (!pointer || pointer.id !== event.pointerId) return;
-      const moved = pointer.moved, stale = event.timeStamp - pointer.time > 100;
+      const moved = pointer.moved;
       pointer = null; viewport.classList.remove('is-dragging'); suppressClick = moved || cancelled;
       if (viewport.hasPointerCapture(event.pointerId)) viewport.releasePointerCapture(event.pointerId);
-      if (moved && !cancelled && !stale && !reduced.matches) { vx *= 12; vy *= 12; moveTo(tx, ty); }
+      if (moved && !cancelled && !reduced.matches) { vx *= 12; vy *= 12; moveTo(tx, ty); }
       else { vx = vy = 0; }
       // Mobile browsers may omit the compatibility click after a recent flick.
       // Resolve an unmoved touch at pointerup and ignore any duplicate native click.
