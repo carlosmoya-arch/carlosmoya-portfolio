@@ -35,6 +35,10 @@ async function zoomChecks(page) {
   const fine = await page.evaluate(()=>matchMedia('(hover: hover) and (pointer: fine)').matches);
   if(!fine)await page.evaluate(()=>{window.logTestInput=[];for(const type of ['pointerdown','pointerup','pointercancel','click','focusin'])document.addEventListener(type,e=>window.logTestInput.push({type,target:e.target.className,detail:e.detail,x:e.clientX,y:e.clientY}),{capture:true})});
   if(fine){ await button.hover();await page.waitForTimeout(600);near(await button.locator('img').evaluate(i=>new DOMMatrix(getComputedStyle(i).transform).a),1.04,.001); }
+  const selected = await button.evaluate(b=>b.closest('figure').dataset.logNumber);
+  const bases = await page.locator('.log-plate').evaluateAll(plates=>plates.map(p=>{
+    const r=p.querySelector('button').getBoundingClientRect();return {number:p.dataset.logNumber,x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height};
+  }));
   if(fine)await button.click();else await button.tap();
   await page.waitForTimeout(1200);
   assert.equal(await page.locator('.log-plate.is-zoomed').count(), 1, !fine ? JSON.stringify(await page.evaluate(()=>window.logTestInput)) : undefined);
@@ -43,32 +47,79 @@ async function zoomChecks(page) {
   const geometry = await page.locator('.log-plate.is-zoomed').evaluate(plate => {
     const box = node => { const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom} };
     return { frame:box(plate.querySelector('button')),caption:box(plate.querySelector('figcaption')),viewport:box(plate.closest('.log-viewport')),scale:new DOMMatrix(getComputedStyle(plate.querySelector('button')).transform).a,
-      neighbors:[...document.querySelectorAll('.log-plate:not(.is-zoomed)')].map(box),pushes:[...document.querySelectorAll('.log-plate:not(.is-zoomed)')].map(p=>new DOMMatrix(getComputedStyle(p).transform).m41) };
+      pushes:[...document.querySelectorAll('.log-plate:not(.is-zoomed)')].map(p=>({number:p.dataset.logNumber,x:new DOMMatrix(getComputedStyle(p).transform).m41,y:new DOMMatrix(getComputedStyle(p).transform).m42})) };
   });
   assert(geometry.scale>=1.5&&geometry.scale<=3.4);
   assert(geometry.frame.left>=15&&geometry.frame.right<=geometry.viewport.right-15);
   assert(geometry.frame.top>=geometry.viewport.top+15&&geometry.caption.bottom<=geometry.viewport.bottom-15,JSON.stringify({frame:geometry.frame,caption:geometry.caption,viewport:geometry.viewport,scale:geometry.scale}));
   assert(geometry.caption.top>=geometry.frame.bottom-1);
-  assert(geometry.pushes.some(value=>Math.abs(value)>1));
-  for(const n of geometry.neighbors)assert(!(n.left<geometry.frame.right&&n.right>geometry.frame.left&&n.top<geometry.caption.bottom&&n.bottom>geometry.frame.top),'Neighbors clear the enlarged plate and caption');
+  const origin=bases.find(p=>p.number===selected), growX=(geometry.scale-1)*origin.w/2, growY=(geometry.scale-1)*origin.h/2;
+  const reactions=geometry.pushes.map(push=>{
+    const base=bases.find(p=>p.number===push.number),ax=base.x-origin.x,ay=base.y-origin.y,d=Math.hypot(ax,ay),f=.55+560*560/(d*d+560*560);
+    // Frame bounds and cached layout measurements can differ by subpixel rounding.
+    near(push.x,ax/d*growX*f,.5);near(push.y,ay/d*growY*f,.5);
+    assert(Math.hypot(push.x,push.y)>0,'Every other plate reacts, including distant plates');
+    return {d,f};
+  });
+  assert.equal(reactions.length,50);assert(reactions.some(r=>r.d>1000));
+  reactions.sort((a,b)=>a.d-b.d);assert(reactions[0].f>reactions.at(-1).f&&reactions.at(-1).f>.55);
   await page.keyboard.press('Escape'); await page.waitForTimeout(600);
   assert.equal(await page.locator('.log-plate.is-zoomed').count(),0);assert.equal(await page.evaluate(()=>window.SiteViews.currentView),'log');
+  assert(await page.locator('.log-plate').evaluateAll(ps=>ps.every(p=>!p.style.getPropertyValue('--push-x')&&!p.style.getPropertyValue('--push-y'))));
   return button;
 }
 (async()=>{
   browser=await chromium.launch({channel:'msedge',headless:true});
   const page=await browser.newPage({viewport:{width:1280,height:720}});
   const errors=[],remote=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))remote.push(r.url())});
+  const entrance=await browser.newPage({viewport:{width:1280,height:720}});
+  await entrance.addInitScript(()=>{
+    let random=0;Math.random=()=>.45+((++random*37)%500)/1000;
+    document.addEventListener('site:content-rendered',()=>{
+      if(window.firstLogSamples||!document.querySelector('.log-viewport'))return;
+      window.firstLogSamples=[];const start=performance.now();
+      const sample=()=>{const view=document.querySelector('.log-viewport');if(!view)return;const v=view.getBoundingClientRect();
+        window.firstLogSamples.push([...view.querySelectorAll('.log-plate.is-revealed')].filter(p=>{const r=p.getBoundingClientRect();return r.right>v.left&&r.left<v.right&&r.bottom>v.top&&r.top<v.bottom}).map(p=>{const s=getComputedStyle(p.querySelector('.log-plate-inner'));return {immediate:p.classList.contains('is-immediate'),opacity:Number(s.opacity),delay:s.transitionDelay}}));
+        if(performance.now()-start<1100)requestAnimationFrame(sample);
+      };requestAnimationFrame(sample);
+    });
+  });
+  await ready(entrance);
+  const samples=await entrance.evaluate(()=>window.firstLogSamples);
+  assert(samples[0].length>0&&samples[0].every(p=>!p.immediate));
+  assert(new Set(samples[0].map(p=>p.delay)).size>1);
+  assert(samples.some(ps=>ps.some(p=>p.opacity>0&&p.opacity<1)),'First-screen plates actually animate over time');
+  const restored=()=>entrance.locator('.log-viewport').evaluate(v=>{const r=v.getBoundingClientRect();return [...v.querySelectorAll('.log-plate')].filter(p=>{const b=p.getBoundingClientRect();return b.right>r.left&&b.left<r.right&&b.bottom>r.top&&b.top<r.bottom}).every(p=>p.classList.contains('is-immediate')&&getComputedStyle(p.querySelector('.log-plate-inner')).opacity==='1')});
+  await entrance.evaluate(()=>window.SiteI18n.setLanguage('es'));assert(await restored());
+  await entrance.setViewportSize({width:1100,height:720});await entrance.waitForTimeout(250);assert(await restored());
+  await entrance.evaluate(()=>window.SiteViews.closeSection());await entrance.waitForTimeout(550);await entrance.evaluate(()=>window.SiteViews.openSection('log'));await entrance.waitForSelector('.section-view.is-visible');assert(await restored());
+  await entrance.evaluate(()=>window.SiteViews.openSection('work'));await entrance.waitForTimeout(1100);await entrance.evaluate(()=>window.SiteViews.openSection('log'));await entrance.waitForSelector('.section-view.is-visible');assert(await restored());
+  await entrance.close();
+  console.log('PASS F2 first entrance has randomized delays and intermediate opacity; language/resize/reopen restore immediately');
   await ready(page);
   assert.equal(await page.locator('.log-plate').count(),51);
   const dimensions=await page.locator('.log-viewport').evaluate(view=>({width:view.clientWidth,height:view.clientHeight,top:view.getBoundingClientRect().top,fieldWidth:view.querySelector('.log-field').offsetWidth,fieldHeight:view.querySelector('.log-field').offsetHeight,column:view.querySelector('.log-column').offsetWidth,gap:getComputedStyle(view.querySelector('.log-field')).columnGap,overflow:getComputedStyle(view.parentElement).overflow}));
   assert.equal(dimensions.top,72);assert.equal(dimensions.height,608);assert.equal(dimensions.column,172);assert.equal(dimensions.gap,'48px');assert.equal(dimensions.overflow,'hidden');assert(dimensions.fieldWidth>1280&&dimensions.fieldHeight>608);
   const initial=await position(page);near(initial.x,(1280-dimensions.fieldWidth)/2);near(initial.y,(608-dimensions.fieldHeight)/2);
+  const equation=await page.locator('.log-viewport').evaluate(v=>{
+    const stack=[...v.querySelectorAll('.log-plate')].reduce((sum,p)=>sum+p.getBoundingClientRect().height+44,0),height=v.clientHeight,gap=48,pitch=220,maximum=Math.ceil(51/3);
+    const count=(width,extra)=>{const k=width-height+gap+95-extra;return Math.max(Math.min(maximum,Math.floor(width/pitch)+2),Math.min(maximum,Math.round((k+Math.sqrt(k*k+4*pitch*stack))/(2*pitch))))};
+    const boundary=Array.from({length:1001},(_,i)=>700+i).find(w=>count(w,0)!==count(w,44));
+    return {expected:count(v.clientWidth,0),actual:v.querySelectorAll('.log-column').length,boundary,boundaryExpected:count(boundary,0)};
+  });
+  assert.equal(equation.actual,equation.expected);assert(equation.boundary);
+  await page.setViewportSize({width:equation.boundary,height:720});await page.waitForTimeout(300);assert.equal(await page.locator('.log-column').count(),equation.boundaryExpected);
+  await page.setViewportSize({width:1280,height:720});await page.waitForTimeout(300);
+  console.log(`PASS F4 quadratic without -44, including column-count rounding boundary at ${equation.boundary}px`);
   const visibleImages=await page.locator('.log-frame img').evaluateAll(images=>images.filter(i=>{const r=i.getBoundingClientRect();return r.left<1280&&r.right>0&&r.top<680&&r.bottom>72}).every(i=>i.complete&&i.naturalWidth>0));assert(visibleImages);
   await page.mouse.move(640,360);await page.mouse.down();await page.mouse.move(730,415,{steps:6});
   const dragged=await position(page);near(dragged.x-initial.x,90);near(dragged.y-initial.y,55);assert(await page.locator('.log-viewport').evaluate(v=>v.classList.contains('is-dragging')));
   await page.mouse.up();await page.waitForTimeout(200);const flicked=await position(page);assert(flicked.x>dragged.x+5||flicked.y>dragged.y+5);assert.equal(await page.locator('.log-plate.is-zoomed').count(),0);
   console.log('PASS desktop drag 1:1, capture, inertia, drag does not click');
+  await ready(page);await page.mouse.move(640,360);await page.mouse.down();await page.mouse.move(690,390,{steps:4});await page.waitForTimeout(200);await page.mouse.up();const held=await position(page);await page.waitForTimeout(250);assert.deepEqual(await position(page),held);
+  const beforeSource=execFileSync('git',['show','HEAD:scripts/log-field.js'],{cwd:root,encoding:'utf8'}),afterSource=fs.readFileSync(path.join(root,'scripts/log-field.js'),'utf8');
+  for(const [start,end] of [["    function animate(time)","    function moveTo"],["    listen(viewport, 'pointermove'","    listen(viewport, 'pointerup'"]])assert.equal(afterSource.slice(afterSource.indexOf(start),afterSource.indexOf(end)),beforeSource.slice(beforeSource.indexOf(start),beforeSource.indexOf(end)));
+  console.log('PASS F3 unchanged: held release does not fling; rate-normalized sampling, decay and lerp exactly preserved');
   await ready(page);const beforeWheel=await position(page);await page.mouse.move(640,360);await page.mouse.wheel(40,60);await page.waitForTimeout(1300);const wheel=await position(page);near(wheel.x,beforeWheel.x-80);near(wheel.y,beforeWheel.y-120);
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('.log-rail')).opacity==='0');
   assert.equal(await page.locator('.view-scroll').evaluate(v=>v.scrollTop),0);

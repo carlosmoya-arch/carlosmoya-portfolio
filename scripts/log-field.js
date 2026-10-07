@@ -18,6 +18,7 @@
   }
 
   function createField(viewport, previous) {
+    const firstMount = !previous && arrived.size === 0;
     const abort = new AbortController();
     const listen = (node, name, handler, options = {}) => node.addEventListener(name, handler, { ...options, signal: abort.signal });
     const field = viewport.querySelector('.log-field'), pan = viewport.querySelector('.log-pan');
@@ -63,7 +64,7 @@
     const fieldScale = new DOMMatrix(getComputedStyle(field).transform).a || 1;
     plates.forEach(plate => { plate.height = plate.figure.getBoundingClientRect().height / fieldScale; });
     const stack = plates.reduce((sum, plate) => sum + plate.height + 44, 0);
-    const k = width - height + gap + 95 - 44;
+    const k = width - height + gap + 95;
     const root = (k + Math.sqrt(k * k + 4 * pitch * stack)) / (2 * pitch);
     const maximum = Math.max(1, Math.ceil(plates.length / 3));
     const minimum = Math.min(maximum, Math.floor(width / pitch) + 2);
@@ -120,7 +121,7 @@
       observer?.unobserve(plate.figure);
     }
     plates.forEach(plate => {
-      if (plate.left + x + plate.w > 0 && plate.left + x < width && plate.top + y + plate.height > 0 && plate.top + y < height) reveal(plate, true);
+      if (plate.left + x + plate.w > 0 && plate.left + x < width && plate.top + y + plate.height > 0 && plate.top + y < height) reveal(plate, !firstMount);
     });
     observer = new IntersectionObserver(entries => entries.forEach(entry => {
       if (entry.isIntersecting) reveal(plates.find(plate => plate.figure === entry.target));
@@ -184,20 +185,12 @@
       plate.figure.style.setProperty('--zoom', scale);
       plate.figure.style.setProperty('--caption-shift', growY + 'px');
       const centerX = plate.left + plate.w / 2, centerY = plate.top + plate.h / 2;
-      const expanded = { left: plate.left - growX - 18, right: plate.left + plate.w + growX + 18, top: plate.top - growY - 18, bottom: plate.top + plate.height + growY + 18 };
-      const reach = Math.max(plate.w * scale, plate.height + growY * 2) * 1.15;
       plates.forEach(neighbor => {
         if (neighbor === plate) return;
-        const dx = neighbor.left + neighbor.w / 2 - centerX, dy = neighbor.top + neighbor.height / 2 - centerY;
-        const distance = Math.hypot(dx, dy), nx = dx / (distance || 1), ny = dy / (distance || 1);
-        let push = Math.max(0, growX, growY) * .45 * Math.pow(Math.max(0, 1 - distance / reach), 2);
-        if (neighbor.left < expanded.right && neighbor.left + neighbor.w > expanded.left && neighbor.top < expanded.bottom && neighbor.top + neighbor.height > expanded.top) {
-          const exitX = Math.abs(nx) < .001 ? Infinity : (nx > 0 ? expanded.right - neighbor.left : neighbor.left + neighbor.w - expanded.left) / Math.abs(nx);
-          const exitY = Math.abs(ny) < .001 ? Infinity : (ny > 0 ? expanded.bottom - neighbor.top : neighbor.top + neighbor.height - expanded.top) / Math.abs(ny);
-          push = Math.max(push, Math.min(exitX, exitY) + 8);
-        }
-        neighbor.figure.style.setProperty('--push-x', nx * push + 'px');
-        neighbor.figure.style.setProperty('--push-y', ny * push + 'px');
+        const ax = neighbor.left + neighbor.w / 2 - centerX, ay = neighbor.top + neighbor.h / 2 - centerY;
+        const d = Math.hypot(ax, ay), f = .55 + 560 * 560 / (d * d + 560 * 560);
+        neighbor.figure.style.setProperty('--push-x', ax / (d || 1) * growX * f + 'px');
+        neighbor.figure.style.setProperty('--push-y', ay / (d || 1) * growY * f + 'px');
       });
       const image = plate.button.querySelector('img');
       const preload = new Image(); preload.decoding = 'async'; preload.src = plate.largeSource;
