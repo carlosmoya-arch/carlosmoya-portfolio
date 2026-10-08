@@ -1,0 +1,23 @@
+/* Native cursor stays visible until a working mouse handler enables this class. */
+.experiment-cursor { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  html.has-experiment-cursor, html.has-experiment-cursor * { cursor: none !important; }
+  html.has-experiment-cursor .experiment-cursor {
+    display: block;
+    position: fixed;
+    z-index: 2147483647;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ink);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: width 150ms ease, height 150ms ease;
+  }
+  html.has-experiment-cursor .experiment-cursor.is-interactive { width: 16px; height: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.has-experiment-cursor .experiment-cursor { transition: none; }
+}

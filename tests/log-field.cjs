@@ -77,8 +77,10 @@ async function zoomChecks(page) {
     let random=0;Math.random=()=>.45+((++random*37)%500)/1000;
     document.addEventListener('site:content-rendered',()=>{
       if(window.firstLogSamples||!document.querySelector('.log-viewport'))return;
-      window.firstLogSamples=[];const start=performance.now();
-      const sample=()=>{const view=document.querySelector('.log-viewport');if(!view)return;const v=view.getBoundingClientRect();
+      // Start the sampling window at the first painted frame, not during startup.
+      // Slow initial rendering otherwise consumes the entire window before rAF runs.
+      window.firstLogSamples=[];let start;
+      const sample=()=>{if(start===undefined)start=performance.now();const view=document.querySelector('.log-viewport');if(!view)return;const v=view.getBoundingClientRect();
         window.firstLogSamples.push([...view.querySelectorAll('.log-plate.is-revealed')].filter(p=>{const r=p.getBoundingClientRect();return r.right>v.left&&r.left<v.right&&r.bottom>v.top&&r.top<v.bottom}).map(p=>{const s=getComputedStyle(p.querySelector('.log-plate-inner'));return {immediate:p.classList.contains('is-immediate'),opacity:Number(s.opacity),delay:s.transitionDelay}}));
         if(performance.now()-start<1100)requestAnimationFrame(sample);
       };requestAnimationFrame(sample);
